@@ -45,8 +45,6 @@ Output: `dist/Wrye Bash Nexus Downloader.exe`
 
 When launched without arguments, the app opens the main GUI window. It runs as a single instance — subsequent launches with an NXM link forward the link to the running instance via IPC.
 
-```
-
 ## Config
 
 Stored in `wb_nxm_downloader.json` next to the executable (compatible with the Go version):

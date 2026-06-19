@@ -82,7 +82,7 @@ Stored in `wb_nxm_downloader.json` next to the executable (compatible with the G
 }
 ```
 
-`seven_zip_path` is optional — leave blank to auto-detect `7z.exe` from PATH or the Wrye Bash installation. Required only for Collections downloads.
+`seven_zip_path` is optional — leave blank to auto-detect `7z.exe` from PATH or the Wrye Bash installation.
 
 ## License
 

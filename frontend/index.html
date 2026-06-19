@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wrye Bash Nexus Downloader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Downloads</h1>
+            <button id="btn-settings" title="Settings">⚙</button>
+        </header>
+        <div id="download-list"></div>
+        <div id="empty-state">No downloads yet. Click "Download with Mod Manager" on Nexus Mods.</div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-overlay" class="hidden">
+        <div id="settings-dialog">
+            <h2>Settings</h2>
+            <label>
+                <span>Nexus Mods API Key</span>
+                <div class="input-row">
+                    <input type="password" id="cfg-apikey" placeholder="Enter your API key">
+                    <button id="btn-validate">Validate</button>
+                    <button id="btn-getkey">Get API Key</button>
+                </div>
+                <small id="validate-status"></small>
+            </label>
+            <label>
+                <span>Download Directory</span>
+                <div class="input-row">
+                    <input type="text" id="cfg-downloaddir" readonly>
+                    <button id="btn-browse">Browse</button>
+                </div>
+            </label>
+            <label>
+                <span>7-Zip Path (required for Collections)</span>
+                <div class="input-row">
+                    <input type="text" id="cfg-sevenzippath" placeholder="Auto-detect (leave blank)">
+                    <button id="btn-browse-7z">Browse</button>
+                </div>
+            </label>
+            <label class="checkbox-row">
+                <input type="checkbox" id="cfg-tray">
+                <span>Minimize to tray on close</span>
+            </label>
+            <label class="checkbox-row">
+                <input type="checkbox" id="cfg-appendmodid">
+                <span>Append Mod ID to filename</span>
+            </label>
+            <label class="checkbox-row">
+                <input type="checkbox" id="cfg-appendversion">
+                <span>Append version to filename</span>
+            </label>
+            <div class="separator"></div>
+            <label>
+                <span>Nexus NXM Protocol Handler</span>
+                <div class="input-row">
+                    <button id="btn-register">Register</button>
+                    <button id="btn-deregister">Deregister</button>
+                    <span id="reg-status"></span>
+                </div>
+            </label>
+            <label>
+                <span>MO2 MODL Protocol Handler</span>
+                <div class="input-row">
+                    <button id="btn-register-modl">Register</button>
+                    <button id="btn-deregister-modl">Deregister</button>
+                    <span id="reg-modl-status"></span>
+                </div>
+            </label>
+            <div class="dialog-buttons">
+                <button id="btn-save" class="primary">Save</button>
+                <button id="btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

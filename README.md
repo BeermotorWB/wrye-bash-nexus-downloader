@@ -1,8 +1,10 @@
-# Wrye Bash Nexus Downloader (Python Port)
+# Wrye Bash Nexus Downloader
 
 A standalone Windows GUI application that handles `nxm://` and `modl://` (MO2) protocol links from the browser and downloads mod files from Nexus Mods, naming them according to Wrye Bash conventions. Built with [pywebview](https://pywebview.flowrl.com/) (Python + WebView2) with system tray support.
 
-> **⚠️ This is a mostly untested Python port of the [Go/Wails original](https://github.com/BeermotorWB/wrye-bash-nexus-downloader). Use at your own risk. No support is provided.**
+This is the preview of the NXM download handler for Wrye Bash >316 NexusMods integrations. 
+
+Windows requires that protocol handlers called from web browsers be executables, et voila.
 
 ## Prerequisites
 

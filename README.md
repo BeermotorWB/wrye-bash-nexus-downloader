@@ -45,26 +45,6 @@ Output: `dist/Wrye Bash Nexus Downloader.exe`
 
 When launched without arguments, the app opens the main GUI window. It runs as a single instance — subsequent launches with an NXM link forward the link to the running instance via IPC.
 
-## Architecture
-
-```
-main.py                  Entrypoint (argv parsing, single-instance, webview bootstrap)
-config.py                JSON config read/write
-nxm_parser.py            NXM URL parser (mods + collections)
-modl_parser.py           MODL URL parser (MO2 direct downloads)
-nexus_client.py          Nexus Mods v1 API + GraphQL client (collections)
-download_manager.py      Download manager (streaming, pause/resume/cancel)
-archive.py               7z extraction wrapper (used for collection archives)
-instance.py              Single-instance gate (mutex + IPC)
-registry.py              Windows registry for nxm:// and modl:// protocols
-tray.py                  System tray integration
-focus.py                 Window focus helpers (Windows-specific)
-api.py                   JS bridge (wires downloads + IPC + UI)
-frontend/
-  index.html             Main UI
-  app.js                 Frontend logic
-  style.css              Styling (dark/light theme)
-icons/                   Application icons
 ```
 
 ## Config

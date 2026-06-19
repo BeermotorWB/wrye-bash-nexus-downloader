@@ -31,7 +31,7 @@ class NexusClient:
             "apikey": api_key,
             "accept": "application/json",
             "application-name": "NXMLink",
-            "application-version": "2.0.0",
+            "application-version": "2.1.0",
         })
         self._session.timeout = TIMEOUT
 

@@ -259,11 +259,20 @@ class Api:
         threading.Thread(target=self._start_modl_download, args=(link,), daemon=True).start()
 
     def _start_nxm_download(self, link):
+        stop_waiting = self._show_waiting(
+            f"{link.game_domain} mod {link.mod_id}, file {link.file_id}")
         try:
             client = NexusClient(self.cfg.api_key)
             file_info = client.file_details(link.game_domain, link.mod_id, link.file_id)
             links = client.generate_download_link(link.game_domain, link.mod_id, link.file_id,
                                                   link.key, link.expires)
+        except Exception as e:
+            if not stop_waiting():
+                self._emit_error(f"Download error: {e}")
+            return
+        if stop_waiting():
+            return
+        try:
             if not links:
                 self._emit_error("No download links returned.")
                 return
@@ -297,6 +306,26 @@ class Api:
         except Exception as e:
             self._emit_error(f"Download error: {e}")
 
+    def _show_waiting(self, label: str):
+        """List a Waiting row while Nexus answers a link, which can take a
+        minute or more when Nexus is slow. The returned stop() removes the row
+        and returns True if the user cancelled it meanwhile, in which case the
+        caller drops the link. Calling stop() again is harmless."""
+        id = self._new_id("wait-")
+        item = self._dl_mgr.add_waiting(id, f"Waiting for: {label}")
+        removed = False
+
+        def stop() -> bool:
+            nonlocal removed
+            if removed:
+                return False
+            if item.state == State.CANCELLED:
+                return True
+            self._dl_mgr.remove(id)  # remove() marks the item Cancelled on its way out
+            removed = True
+            return False
+        return stop
+
     def _new_id(self, prefix: str = "") -> str:
         with self._lock:
             self._next_id += 1
@@ -313,6 +342,8 @@ class Api:
         with self._coll_lock:
             gen = self._cancel_gen
         client = NexusClient(self.cfg.api_key)
+        stop_waiting = self._show_waiting(
+            f"Collection {link.collection_slug}, revision {link.revision_number}")
 
         try:
             _, premium = client.validate_key()
@@ -320,7 +351,14 @@ class Api:
         except Exception:
             pass
 
-        rev = client.get_collection_revision(link.collection_slug, link.revision_number)
+        try:
+            rev = client.get_collection_revision(link.collection_slug, link.revision_number)
+        except Exception:
+            if stop_waiting():
+                return
+            raise
+        if stop_waiting():
+            return
 
         # let user pick destination folder
         self._show_and_focus()

@@ -153,6 +153,16 @@ header #btn-cancel-queued { font-size: 13px; }
 .dl-item:has(.status.skipped) .fill { background: var(--skipped); }
 .dl-item .status.cancelled { color: var(--cancelled); }
 .dl-item:has(.status.cancelled) .fill { background: var(--cancelled); }
+/* Waiting for Nexus: no progress to show, so a segment slides across the bar */
+.dl-item:has(.status.waiting) .fill {
+    width: 30% !important;
+    transition: none;
+    animation: waiting-slide 1.5s ease-in-out infinite;
+}
+@keyframes waiting-slide {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(340%); }
+}
 
 #notice {
     padding: 8px 16px;

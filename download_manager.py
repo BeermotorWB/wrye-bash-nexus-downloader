@@ -25,6 +25,7 @@ class State(Enum):
     ERROR = "Error"
     CANCELLED = "Cancelled"
     SKIPPED = "Skipped"  # already in the target folder; nothing downloaded
+    WAITING = "Waiting"  # a link waiting for Nexus to answer; not a download yet
 
 
 FINISHED = (State.DONE, State.ERROR, State.CANCELLED, State.SKIPPED)
@@ -106,6 +107,17 @@ class DownloadManager:
         item.state = State.SKIPPED
         item.done_bytes = size
         item.started = True
+        with self._lock:
+            self._items.append(item)
+        self._notify()
+        return item
+
+    def add_waiting(self, id: str, label: str) -> DownloadItem:
+        """List a link that is still waiting for Nexus to answer, so a slow API
+        shows up in the list. The caller removes it once Nexus answers; cancel
+        marks it Cancelled, and the caller then drops the link."""
+        item = DownloadItem(id, "", "", label, 0)
+        item.state = State.WAITING
         with self._lock:
             self._items.append(item)
         self._notify()

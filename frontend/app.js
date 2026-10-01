@@ -25,11 +25,11 @@ function renderDownloads(downloads) {
             </div>
             <div class="progress-bar"><div class="fill" style="width:${dl.percent}%"></div></div>
             <div class="row-bottom">
-                <span class="status ${dl.status.toLowerCase()}">${dl.status}${dl.status === 'Skipped' ? ' \u00b7 already in folder' : ''}${dl.status === 'Downloading' ? ' \u00b7 ' + dl.speed + ' \u00b7 ' + dl.percent + '%' : ''}${dl.error ? ' \u00b7 ' + dl.error : ''}</span>
+                <span class="status ${dl.status.toLowerCase()}">${dl.status === 'Waiting' ? 'Waiting for Nexus…' : dl.status}${dl.status === 'Skipped' ? ' \u00b7 already in folder' : ''}${dl.status === 'Downloading' ? ' \u00b7 ' + dl.speed + ' \u00b7 ' + dl.percent + '%' : ''}${dl.error ? ' \u00b7 ' + dl.error : ''}</span>
                 <div class="actions">
                     ${dl.status === 'Downloading' ? '<button onclick="onPause(\'' + dl.id + '\')">Pause</button>' : ''}
                     ${dl.status === 'Paused' ? '<button onclick="onResume(\'' + dl.id + '\')">Resume</button>' : ''}
-                    ${dl.status === 'Downloading' || dl.status === 'Paused' || dl.status === 'Queued' ? '<button onclick="onCancel(\'' + dl.id + '\')">Cancel</button>' : ''}
+                    ${dl.status === 'Downloading' || dl.status === 'Paused' || dl.status === 'Queued' || dl.status === 'Waiting' ? '<button onclick="onCancel(\'' + dl.id + '\')">Cancel</button>' : ''}
                     ${dl.status === 'Done' || dl.status === 'Error' || dl.status === 'Cancelled' || dl.status === 'Skipped' ? '<button onclick="onRemove(\'' + dl.id + '\')">Remove</button>' : ''}
                 </div>
             </div>

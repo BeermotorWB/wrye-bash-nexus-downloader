@@ -111,16 +111,23 @@ class DownloadManager:
         self._notify()
         return item
 
-    def add_cancelled(self, id: str, dest_dir: str, name: str) -> DownloadItem:
-        """List a download that was cancelled before it was queued (a
-        collection mod not yet reached when "Cancel all queued" was used)."""
-        item = DownloadItem(id, "", dest_dir, name, 0)
-        item.state = State.CANCELLED
-        item._cancelled = True
+    def add_cancelled(self, dest_dir: str, rows: list[tuple[str, str]]) -> None:
+        """List downloads that were cancelled before they were queued
+        (collection mods not yet reached when "Cancel all queued" was used),
+        given as (id, name) pairs. All rows are added at once with a single
+        update: each update re-renders the whole list and waits for the page,
+        so one per row made them trickle in after "Clear All Completed"."""
+        items = []
+        for id, name in rows:
+            item = DownloadItem(id, "", dest_dir, name, 0)
+            item.state = State.CANCELLED
+            item._cancelled = True
+            items.append(item)
+        if not items:
+            return
         with self._lock:
-            self._items.append(item)
+            self._items.extend(items)
         self._notify()
-        return item
 
     def _start_queued(self) -> None:
         """Start queued items, in the order they were added, while there are

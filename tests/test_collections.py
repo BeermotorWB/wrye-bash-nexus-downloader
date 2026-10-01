@@ -63,6 +63,16 @@ def test_cancel_all_queued_lists_unqueued_mods(tmp_path, monkeypatch):
     assert a._dl_mgr.items() == []
 
 
+def test_cancelled_rows_are_added_in_one_update():
+    """Each UI update waits for the page to re-render the whole list; one per
+    row made the rows trickle in after "Clear All Completed"."""
+    updates = []
+    mgr = DownloadManager(on_change=lambda: updates.append(len(mgr.items())))
+    run = CollectionRun(dest_dir="", todo=pending(60))
+    assert run.cancel(mgr) == 60
+    assert updates == [60]
+
+
 def test_collection_stops_at_first_403(http_server, tmp_path, monkeypatch):
     """A free account's keyless download_link gets 403: one message, and no
     further mods are tried."""

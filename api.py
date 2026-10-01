@@ -50,8 +50,8 @@ class CollectionRun:
                 return 0
             self.cancelled = True
             rest = self.todo[self.next:]
-            for p in rest:
-                mgr.add_cancelled(f"cancel-{p.domain}-{p.file_id}", self.dest_dir, p.label)
+            mgr.add_cancelled(self.dest_dir,
+                              [(f"cancel-{p.domain}-{p.file_id}", p.label) for p in rest])
             return len(rest)
 
     def skip(self) -> bool:

@@ -43,10 +43,10 @@ def test_retry_after_429(http_server):
         if n <= 2:
             reply(req, 429, headers=rate_headers("1990", "19990"))
         else:
-            reply(req, body=b'{"file_id": 795992, "uid": 7318625068376, "uploaded_timestamp": 1787849567}')
+            reply(req, body=b'{"file_id": 795992, "uid": 7318625068376, "file_name": "a.7z"}')
     srv, url = http_server(handler)
     fi = client_for(url).file_details("skyrimspecialedition", 30379, 795992)
-    assert (fi.file_id, fi.uid, fi.uploaded_timestamp) == (795992, 7318625068376, 1787849567)
+    assert (fi.file_id, fi.uid, fi.file_name) == (795992, 7318625068376, "a.7z")
     assert len(srv.requests) == 3  # 2 retries
 
 
@@ -100,7 +100,7 @@ def test_graphql_retry_resends_body(http_server):
     assert rev.revision_number == 325 and rev.collection_slug == "xk05aw"
     f = rev.mod_files[0]
     # GraphQL serves uid and sizeInBytes as strings
-    assert (f.uid, f.size_in_bytes, f.date) == (7318625068376, 952607, 1787849567)
+    assert (f.uid, f.size_in_bytes) == (7318625068376, 952607)
 
 
 @pytest.mark.parametrize("header, want", [

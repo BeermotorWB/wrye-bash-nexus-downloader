@@ -88,13 +88,12 @@ class RateLimits:
 class FileInfo:
     file_id: int
     uid: int
-    file_name: str  # Nexus's uploaded file name; only its extension is used
+    file_name: str  # Nexus's file name; downloads are saved under it
     name: str       # display name
     version: str
     size_kb: int
     size_in_bytes: int
     mod_version: str
-    uploaded_timestamp: int  # unix seconds
 
 
 @dataclass
@@ -111,8 +110,7 @@ class RevisionModFile:
     file_id: int
     name: str
     version: str
-    date: int  # upload time, unix seconds
-    uid: int   # served as a decimal string
+    uid: int  # served as a decimal string
     size_in_bytes: int  # served as a string
     domain: str
 
@@ -148,7 +146,6 @@ REVISION_QUERY = """query collectionRevision($slug: String!, $revision: Int, $vi
         name
         version
         uri
-        date
         uid
         sizeInBytes
         game { domainName }
@@ -246,7 +243,6 @@ class NexusClient:
             size_kb=data.get("size_kb", 0),
             size_in_bytes=data.get("size_in_bytes") or 0,
             mod_version=data.get("mod_version", ""),
-            uploaded_timestamp=data.get("uploaded_timestamp", 0),
         )
 
     def generate_download_link(self, game_domain: str, mod_id: int, file_id: int,
@@ -304,7 +300,7 @@ class NexusClient:
             files.append(RevisionModFile(
                 mod_id=f.get("modId", 0), file_id=f.get("fileId", 0),
                 name=f.get("name", ""), version=f.get("version", ""),
-                date=f.get("date", 0), uid=int(f.get("uid") or 0),
+                uid=int(f.get("uid") or 0),
                 size_in_bytes=int(f.get("sizeInBytes") or 0),
                 domain=(f.get("game") or {}).get("domainName", "")))
         return RevisionInfo(

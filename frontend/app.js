@@ -143,8 +143,6 @@ async function openSettings() {
     document.getElementById('cfg-downloaddir').value = cfg.download_dir || '';
     document.getElementById('cfg-sevenzippath').value = cfg.seven_zip_path || '';
     document.getElementById('cfg-tray').checked = cfg.minimize_to_tray;
-    document.getElementById('cfg-appendmodid').checked = cfg.append_mod_id;
-    document.getElementById('cfg-appendversion').checked = cfg.append_version;
     document.getElementById('validate-status').textContent = '';
 
     const registered = await api().is_registered();
@@ -165,10 +163,8 @@ async function saveSettings() {
     const downloadDir = document.getElementById('cfg-downloaddir').value;
     const sevenZipPath = document.getElementById('cfg-sevenzippath').value;
     const tray = document.getElementById('cfg-tray').checked;
-    const appendModID = document.getElementById('cfg-appendmodid').checked;
-    const appendVersion = document.getElementById('cfg-appendversion').checked;
     try {
-        await api().save_config(apiKey, downloadDir, tray, appendModID, appendVersion, sevenZipPath);
+        await api().save_config(apiKey, downloadDir, tray, sevenZipPath);
         closeSettings();
     } catch(e) {
         alert('Failed to save: ' + e);

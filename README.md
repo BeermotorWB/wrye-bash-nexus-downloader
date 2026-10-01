@@ -1,6 +1,6 @@
 # Wrye Bash Nexus Downloader
 
-A standalone Windows GUI application that handles `nxm://` and `modl://` (MO2) protocol links from the browser and downloads mod files from Nexus Mods, naming them according to Wrye Bash conventions. Built with [pywebview](https://pywebview.flowrl.com/) (Python + WebView2) with system tray support.
+A standalone Windows GUI application that handles `nxm://` and `modl://` (MO2) protocol links from the browser and downloads mod files from Nexus Mods under Nexus's own file names, which Wrye Bash reads the mod ID from. Built with [pywebview](https://pywebview.flowrl.com/) (Python + WebView2) with system tray support.
 
 This is the preview of the NXM download handler for Wrye Bash >316 NexusMods integrations. 
 
@@ -66,8 +66,6 @@ Stored in `wb_nxm_downloader.json` next to the executable (compatible with the G
   "api_key": "your-nexus-api-key",
   "download_dir": "C:\\path\\to\\downloads",
   "minimize_to_tray": true,
-  "append_mod_id": true,
-  "append_version": true,
   "seven_zip_path": "",
   "max_parallel_downloads": 1
 }

@@ -25,8 +25,6 @@ class Config:
     api_key: str = ""
     download_dir: str = ""
     minimize_to_tray: bool = True
-    append_mod_id: bool = True
-    append_version: bool = True
     seven_zip_path: str = ""
     # Applies to Premium accounts only (Vortex: 1-10, default 1; free
     # accounts always get 1). Not in the Settings UI.
@@ -41,8 +39,6 @@ class Config:
             "api_key": self.api_key,
             "download_dir": self.download_dir,
             "minimize_to_tray": self.minimize_to_tray,
-            "append_mod_id": self.append_mod_id,
-            "append_version": self.append_version,
             "seven_zip_path": self.seven_zip_path,
         }
         if self.max_parallel_downloads:
@@ -59,8 +55,6 @@ class Config:
                 cfg.api_key = data.get("api_key", "")
                 cfg.download_dir = data.get("download_dir", "") or _default_download_dir()
                 cfg.minimize_to_tray = data.get("minimize_to_tray", True)
-                cfg.append_mod_id = data.get("append_mod_id", True)
-                cfg.append_version = data.get("append_version", True)
                 cfg.seven_zip_path = data.get("seven_zip_path", "")
                 cfg.max_parallel_downloads = int(data.get("max_parallel_downloads", 0) or 0)
             except (json.JSONDecodeError, OSError):

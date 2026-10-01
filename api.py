@@ -12,8 +12,7 @@ import webview
 
 import archive
 from config import Config
-from download_manager import (DownloadManager, NameParts, State, build_filename,
-                              file_md5)
+from download_manager import DownloadManager, State, file_md5, safe_filename
 from modl_parser import parse_modl
 from nexus_client import NexusAPIError, NexusClient, RateLimitedError, RevisionModFile
 from nxm_parser import is_collection_url, parse_collection, parse_nxm
@@ -156,18 +155,14 @@ class Api:
             "api_key": self.cfg.api_key,
             "download_dir": self.cfg.download_dir,
             "minimize_to_tray": self.cfg.minimize_to_tray,
-            "append_mod_id": self.cfg.append_mod_id,
-            "append_version": self.cfg.append_version,
             "seven_zip_path": self.cfg.seven_zip_path,
         }
 
     def save_config(self, api_key: str, download_dir: str, minimize_to_tray: bool,
-                    append_mod_id: bool, append_version: bool, seven_zip_path: str = ""):
+                    seven_zip_path: str = ""):
         self.cfg.api_key = api_key
         self.cfg.download_dir = download_dir
         self.cfg.minimize_to_tray = minimize_to_tray
-        self.cfg.append_mod_id = append_mod_id
-        self.cfg.append_version = append_version
         self.cfg.seven_zip_path = seven_zip_path
         self.cfg.save()
 
@@ -273,11 +268,7 @@ class Api:
                 self._emit_error("No download links returned.")
                 return
 
-            default_name = build_filename(NameParts(
-                name=file_info.name, mod_id=link.mod_id, version=file_info.version,
-                uploaded=file_info.uploaded_timestamp, uid=file_info.uid,
-                ext=os.path.splitext(file_info.file_name)[1],
-            ), self.cfg.append_mod_id, self.cfg.append_version)
+            default_name = safe_filename(file_info.file_name)
             self._show_and_focus()
             save_path = self._save_dialog(default_name)
             if not save_path:
@@ -457,29 +448,20 @@ class Api:
 
     def _collection_file_name(self, client: NexusClient, rf: RevisionModFile | None,
                               p: PendingMod, cdn_url: str) -> tuple[str, int, int]:
-        """A collection mod's filename from the revision's GraphQL metadata,
-        with the extension from the CDN's Content-Disposition. If either is
-        unavailable, falls back to a v1 file_details call. Returns the
-        filename, file UID and size in bytes."""
+        """A collection mod's filename (Nexus's file_name, from the CDN's
+        Content-Disposition), file UID and size in bytes, using the revision's
+        GraphQL metadata. If either is unavailable, falls back to a v1
+        file_details call."""
         if rf is not None and rf.uid:
             try:
                 cdn_name = client.cdn_file_name(cdn_url)
             except Exception:
                 cdn_name = ""
             if cdn_name:
-                name = build_filename(NameParts(
-                    name=rf.name, mod_id=p.mod_id, version=rf.version, uploaded=rf.date,
-                    uid=rf.uid, ext=os.path.splitext(cdn_name)[1],
-                ), self.cfg.append_mod_id, self.cfg.append_version)
-                return name, rf.uid, rf.size_in_bytes
+                return safe_filename(cdn_name), rf.uid, rf.size_in_bytes
 
         fi = client.file_details(p.domain, p.mod_id, p.file_id)
-        name = build_filename(NameParts(
-            name=fi.name, mod_id=p.mod_id, version=fi.version,
-            uploaded=fi.uploaded_timestamp, uid=fi.uid,
-            ext=os.path.splitext(fi.file_name)[1],
-        ), self.cfg.append_mod_id, self.cfg.append_version)
-        return name, fi.uid, fi.size_in_bytes
+        return safe_filename(fi.file_name), fi.uid, fi.size_in_bytes
 
     # -- Dialogs and events --
     def _save_dialog(self, default_name: str) -> str:

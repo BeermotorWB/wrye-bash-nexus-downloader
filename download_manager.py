@@ -3,13 +3,11 @@ import hashlib
 import os
 import time
 import threading
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Callable
 
 import requests
-from sqids import Sqids
 
 # How often a failed download is retried, resuming from the partial file
 # (MO2: DownloadManager::AUTOMATIC_RETRIES = 3).
@@ -369,37 +367,13 @@ def file_md5(path) -> str:
     return h.hexdigest()
 
 
-@dataclass
-class NameParts:
-    """The Nexus API fields a download filename is built from."""
-    name: str       # file display name (API "name")
-    mod_id: int
-    version: str
-    uploaded: int   # upload time, unix seconds
-    uid: int        # file UID, encoded as the Sqids token
-    ext: str        # extension with leading dot, from Nexus's file_name
-
-
 _ILLEGAL_NAME_CHARS = str.maketrans({c: "_" for c in '<>:"/\\|?*'})
-_VERSION_SEPARATORS = str.maketrans({c: "-" for c in " ./\\"})
-_SQIDS = Sqids()
 
 
-def build_filename(p: NameParts, append_mod_id: bool, append_version: bool) -> str:
-    """The download filename in the old Nexus format that Wrye Bash's
-    reTesNexus parses, plus the Sqids token for update tracking:
-
-        {name}-{modID}-{version}-{uploaded}_{sqid}{ext}
-
-    append_mod_id / append_version drop their segment when false."""
-    name = p.name.translate(_ILLEGAL_NAME_CHARS)
-    if append_mod_id:
-        name += f"-{p.mod_id}"
-    if append_version and p.version:
-        name += "-" + p.version.translate(_VERSION_SEPARATORS)
-    name += f"-{p.uploaded}"
-    name += "_" + _SQIDS.encode([p.uid])
-    return name + p.ext
+def safe_filename(name: str) -> str:
+    """Nexus's file_name with the characters Windows forbids in file names
+    replaced by "_". Downloads otherwise keep Nexus's own name."""
+    return name.translate(_ILLEGAL_NAME_CHARS)
 
 
 def _format_speed(bps: float) -> str:

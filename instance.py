@@ -4,6 +4,8 @@ import socket
 import threading
 from ctypes import wintypes
 
+from focus import allow_foreground
+
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
 
 MUTEX_NAME = "WryeBashNXMDownloader_SingleInstance"
@@ -38,6 +40,7 @@ def try_be_primary() -> bool:
 
 def send_to_primary(url: str) -> bool:
     """Send a URL to the running primary instance. Returns True on success."""
+    allow_foreground()
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(("127.0.0.1", IPC_PORT))

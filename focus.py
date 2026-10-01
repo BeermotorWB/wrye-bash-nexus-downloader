@@ -29,6 +29,24 @@ ShowWindow = user32.ShowWindow
 ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
 SW_RESTORE = 9
 
+AllowSetForegroundWindow = user32.AllowSetForegroundWindow
+AllowSetForegroundWindow.argtypes = [wintypes.DWORD]
+AllowSetForegroundWindow.restype = wintypes.BOOL
+
+
+def allow_foreground(title: str = "Wrye Bash Nexus Downloader"):
+    """Let the running instance bring its window (and the Save dialog) to
+    the front. Windows lets this process do so because the browser, the
+    foreground process, started it; the running instance was not, so without
+    this its dialog opens behind the browser."""
+    hwnd = FindWindowW(None, title)
+    if not hwnd:
+        return
+    pid = wintypes.DWORD()
+    GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+    if pid.value:
+        AllowSetForegroundWindow(pid.value)
+
 
 def bring_to_front(title: str = "Wrye Bash Nexus Downloader"):
     """Force the application window to the foreground."""

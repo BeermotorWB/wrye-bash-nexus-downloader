@@ -28,6 +28,9 @@ class Config:
     append_mod_id: bool = True
     append_version: bool = True
     seven_zip_path: str = ""
+    # Applies to Premium accounts only (Vortex: 1-10, default 1; free
+    # accounts always get 1). Not in the Settings UI.
+    max_parallel_downloads: int = 0
 
     def __post_init__(self):
         if not self.download_dir:
@@ -42,6 +45,8 @@ class Config:
             "append_version": self.append_version,
             "seven_zip_path": self.seven_zip_path,
         }
+        if self.max_parallel_downloads:
+            data["max_parallel_downloads"] = self.max_parallel_downloads
         _config_path().write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     @staticmethod
@@ -57,6 +62,7 @@ class Config:
                 cfg.append_mod_id = data.get("append_mod_id", True)
                 cfg.append_version = data.get("append_version", True)
                 cfg.seven_zip_path = data.get("seven_zip_path", "")
+                cfg.max_parallel_downloads = int(data.get("max_parallel_downloads", 0) or 0)
             except (json.JSONDecodeError, OSError):
                 pass
         return cfg

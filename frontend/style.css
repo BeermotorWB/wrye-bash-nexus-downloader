@@ -9,6 +9,8 @@
     --accent-hover: #3a8eef;
     --danger: #e55;
     --success: #4c4;
+    --skipped: #a67c00; /* mustard, dark enough for text on white */
+    --cancelled: #d9480f; /* orange */
     --progress-bg: #e0e0e0;
     --progress-fill: #4a9eff;
     --overlay: rgba(0,0,0,0.4);
@@ -26,6 +28,8 @@
         --border: #444;
         --progress-bg: #444;
         --progress-fill: #4a9eff;
+        --skipped: #e1ad01;
+        --cancelled: #fb923c;
         --overlay: rgba(0,0,0,0.6);
         --dialog-bg: #2a2a2a;
         --shadow: 0 4px 24px rgba(0,0,0,0.4);
@@ -68,6 +72,8 @@ header button {
     border-radius: 4px;
 }
 header button:hover { background: var(--bg-hover); }
+header .header-actions { display: flex; align-items: center; gap: 4px; }
+header #btn-cancel-queued { font-size: 13px; }
 
 #download-list {
     flex: 1;
@@ -143,6 +149,20 @@ header button:hover { background: var(--bg-hover); }
 }
 .dl-item .status.error { color: var(--danger); }
 .dl-item .status.done { color: var(--success); }
+.dl-item .status.skipped { color: var(--skipped); }
+.dl-item:has(.status.skipped) .fill { background: var(--skipped); }
+.dl-item .status.cancelled { color: var(--cancelled); }
+.dl-item:has(.status.cancelled) .fill { background: var(--cancelled); }
+
+#notice {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--cancelled);
+    background: var(--bg-secondary);
+    font-size: 13px;
+    transition: opacity 0.5s;
+}
+#notice.fading { opacity: 0; }
 
 .dl-item .actions {
     display: flex;

@@ -3,3 +3,4 @@ pystray==0.19.5
 Pillow==11.1.0
 requests==2.32.3
 pyinstaller==6.11.1
+sqids==0.5.2

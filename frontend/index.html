@@ -10,8 +10,12 @@
     <div id="app">
         <header>
             <h1>Downloads</h1>
-            <button id="btn-settings" title="Settings">⚙</button>
+            <div class="header-actions">
+                <button id="btn-cancel-queued" class="hidden" title="Cancel every download that hasn't started yet">Cancel all queued</button>
+                <button id="btn-settings" title="Settings">⚙</button>
+            </div>
         </header>
+        <div id="notice" class="hidden" role="status"></div>
         <div id="download-list"></div>
         <div id="empty-state">No downloads yet. Click "Download with Mod Manager" on Nexus Mods.</div>
     </div>

@@ -21,6 +21,15 @@ python -m venv .venv
 
 Output: `dist/Wrye Bash Nexus Downloader.exe`
 
+## Test
+
+```bash
+.venv\Scripts\pip install -r requirements-dev.txt
+.venv\Scripts\python -m pytest -q
+```
+
+The tests use a local HTTP server and never contact Nexus. The release workflow runs them before building.
+
 ## Usage
 
 ```
@@ -39,6 +48,9 @@ Output: `dist/Wrye Bash Nexus Downloader.exe`
 # Handle an NXM link (browser invocation)
 "Wrye Bash Nexus Downloader.exe" "nxm://skyrimspecialedition/mods/12604/files/12345?key=xxx&expires=yyy"
 
+# Handle a collection link (needs a Nexus Premium account)
+"Wrye Bash Nexus Downloader.exe" "nxm://skyrimspecialedition/collections/xk05aw/revisions/325"
+
 # Handle a MODL link (MO2 direct download, no API key needed)
 "Wrye Bash Nexus Downloader.exe" "modl://skyrimspecialedition/?url=https://..."
 ```
@@ -56,11 +68,14 @@ Stored in `wb_nxm_downloader.json` next to the executable (compatible with the G
   "minimize_to_tray": true,
   "append_mod_id": true,
   "append_version": true,
-  "seven_zip_path": ""
+  "seven_zip_path": "",
+  "max_parallel_downloads": 1
 }
 ```
 
 `seven_zip_path` is optional — leave blank to auto-detect `7z.exe` from PATH or the Wrye Bash installation.
+
+`max_parallel_downloads` (1-10, default 1) applies to Premium accounts only; without Premium, downloads run one at a time, as in Vortex.
 
 ## License
 

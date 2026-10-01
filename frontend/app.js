@@ -7,6 +7,8 @@ function api() { return window.pywebview.api; }
 
 // -- Download List --
 function renderDownloads(downloads) {
+    const anyQueued = !!downloads && downloads.some(dl => dl.status === 'Queued');
+    document.getElementById('btn-cancel-queued').classList.toggle('hidden', !anyQueued);
     if (!downloads || downloads.length === 0) {
         downloadList.classList.add('hidden');
         emptyState.classList.remove('hidden');
@@ -23,16 +25,35 @@ function renderDownloads(downloads) {
             </div>
             <div class="progress-bar"><div class="fill" style="width:${dl.percent}%"></div></div>
             <div class="row-bottom">
-                <span class="status ${dl.status.toLowerCase()}">${dl.status}${dl.status === 'Downloading' ? ' \u00b7 ' + dl.speed + ' \u00b7 ' + dl.percent + '%' : ''}${dl.error ? ' \u00b7 ' + dl.error : ''}</span>
+                <span class="status ${dl.status.toLowerCase()}">${dl.status}${dl.status === 'Skipped' ? ' \u00b7 already in folder' : ''}${dl.status === 'Downloading' ? ' \u00b7 ' + dl.speed + ' \u00b7 ' + dl.percent + '%' : ''}${dl.error ? ' \u00b7 ' + dl.error : ''}</span>
                 <div class="actions">
                     ${dl.status === 'Downloading' ? '<button onclick="onPause(\'' + dl.id + '\')">Pause</button>' : ''}
                     ${dl.status === 'Paused' ? '<button onclick="onResume(\'' + dl.id + '\')">Resume</button>' : ''}
-                    ${dl.status === 'Downloading' || dl.status === 'Paused' ? '<button onclick="onCancel(\'' + dl.id + '\')">Cancel</button>' : ''}
-                    ${dl.status === 'Done' || dl.status === 'Error' || dl.status === 'Cancelled' ? '<button onclick="onRemove(\'' + dl.id + '\')">Remove</button>' : ''}
+                    ${dl.status === 'Downloading' || dl.status === 'Paused' || dl.status === 'Queued' ? '<button onclick="onCancel(\'' + dl.id + '\')">Cancel</button>' : ''}
+                    ${dl.status === 'Done' || dl.status === 'Error' || dl.status === 'Cancelled' || dl.status === 'Skipped' ? '<button onclick="onRemove(\'' + dl.id + '\')">Remove</button>' : ''}
                 </div>
             </div>
         </div>
     `).join('');
+}
+
+// -- Notice: short, non-blocking confirmation under the header --
+const notice = document.getElementById('notice');
+let noticeTimers = [];
+function showNotice(text) {
+    noticeTimers.forEach(clearTimeout);
+    notice.textContent = text;
+    notice.classList.remove('hidden', 'fading');
+    noticeTimers = [
+        setTimeout(() => notice.classList.add('fading'), 4500),
+        setTimeout(() => notice.classList.add('hidden'), 5000),
+    ];
+}
+
+async function cancelAllQueued() {
+    const n = await api().cancel_all_queued();
+    showNotice(n === 0 ? 'Nothing was queued.'
+        : `Cancelled ${n} queued download${n === 1 ? '' : 's'}.`);
 }
 
 window.onPause = (id) => api().pause(id);
@@ -74,6 +95,11 @@ downloadList.addEventListener('contextmenu', (e) => {
         ctxMenu.appendChild(deleteBtn);
     }
 
+    const cancelQueuedBtn = document.createElement('div');
+    cancelQueuedBtn.textContent = 'Cancel All Queued';
+    cancelQueuedBtn.onclick = () => { cancelAllQueued(); hideContextMenu(); };
+    ctxMenu.appendChild(cancelQueuedBtn);
+
     const clearBtn = document.createElement('div');
     clearBtn.textContent = 'Clear All Completed';
     clearBtn.onclick = () => { api().clear_completed(); hideContextMenu(); };
@@ -87,6 +113,8 @@ window.addEventListener('pywebviewready', () => {
     api().get_downloads().then(renderDownloads);
     api().is_first_run().then(first => { if (first) openSettings(); });
 });
+
+document.getElementById('btn-cancel-queued').addEventListener('click', cancelAllQueued);
 
 // -- Settings --
 document.getElementById('btn-settings').addEventListener('click', openSettings);

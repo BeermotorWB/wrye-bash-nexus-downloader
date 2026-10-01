@@ -76,6 +76,7 @@ def test_403_is_typed(http_server):
     with pytest.raises(NexusAPIError) as e:
         client_for(url).generate_download_link("skyrimspecialedition", 30379, 795992)
     assert e.value.status == 403
+    assert str(e.value) == 'Nexus API Error 403: {"message":"forbidden"}'
     assert len(srv.requests) == 1  # a 403 is not retried
 
 

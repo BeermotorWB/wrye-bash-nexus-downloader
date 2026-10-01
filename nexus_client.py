@@ -59,7 +59,7 @@ class NexusAPIError(RuntimeError):
     """An API request failed with an HTTP status code."""
 
     def __init__(self, status: int, body: str):
-        super().__init__(f"API error {status}: {body}")
+        super().__init__(f"Nexus API Error {status}: {body}")
         self.status = status
 
 
@@ -287,7 +287,7 @@ class NexusClient:
         errors = body.get("errors")
         if errors:
             code = (errors[0].get("extensions") or {}).get("code", "")
-            raise RuntimeError(f"graphql error: {errors[0].get('message', '')} (code: {code})")
+            raise RuntimeError(f"Nexus API Error: {errors[0].get('message', '')} (code: {code})")
         rev = (body.get("data") or {}).get("collectionRevision")
         if not rev:
             raise RuntimeError("collection revision not found")
